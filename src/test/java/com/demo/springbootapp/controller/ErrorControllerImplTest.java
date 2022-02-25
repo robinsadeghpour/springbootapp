@@ -22,10 +22,11 @@ class ErrorControllerImplTest {
 
     private static Object[][] handleErrorDataProvider() {
         return new Object[][]{
+                {"400", "error-400"},
                 {"404", "error-404"},
                 {"500", "error-500"},
                 {"1", "error"},
-                {null, "error"},
+                {null, "error"}
         };
     }
 

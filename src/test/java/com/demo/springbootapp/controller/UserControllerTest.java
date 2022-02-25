@@ -123,17 +123,6 @@ class UserControllerTest {
     }
 
     @Test
-    public void testGetUserByIdNullsafeError() {
-        when(userRepositoryMock.findById(any())).thenReturn(null);
-
-        ResponseEntity<User> result = underTest.getUserById(USER.getId());
-        assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, result.getStatusCode());
-        assertNull(result.getBody());
-
-        verify(userRepositoryMock).findById(same(USER.getId()));
-    }
-
-    @Test
     public void testCreateUser() throws Exception {
         when(userRepositoryMock.save(any())).thenReturn(USER);
         when(userServiceMock.createNewUser(any())).thenReturn(USER);
@@ -165,26 +154,12 @@ class UserControllerTest {
     }
 
     @Test
-    public void testUpdateUserEmpty() {
+    public void testUpdateUserEmpty() throws Exception {
         when(userRepositoryMock.findById(any())).thenReturn(Optional.empty());
 
         ResponseEntity<User> result = underTest.updateUser(USER.getId(), USER);
 
         assertEquals(HttpStatus.NOT_FOUND, result.getStatusCode());
-        assertNull(result.getBody());
-
-        verify(userRepositoryMock).findById(same(USER.getId()));
-        verifyNoMoreInteractions(userRepositoryMock);
-        verifyNoInteractions(userServiceMock);
-    }
-
-    @Test
-    public void testUpdateUserNullsafeError() {
-        when(userRepositoryMock.findById(any())).thenReturn(null);
-
-        ResponseEntity<User> result = underTest.updateUser(USER.getId(), USER);
-
-        assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, result.getStatusCode());
         assertNull(result.getBody());
 
         verify(userRepositoryMock).findById(same(USER.getId()));
