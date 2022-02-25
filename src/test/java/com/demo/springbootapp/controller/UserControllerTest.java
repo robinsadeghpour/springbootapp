@@ -2,7 +2,7 @@ package com.demo.springbootapp.controller;
 
 import com.demo.springbootapp.model.User;
 import com.demo.springbootapp.repository.UserRepository;
-import com.demo.springbootapp.support.Validator;
+import com.demo.springbootapp.services.UserService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -28,7 +28,7 @@ class UserControllerTest {
     @Mock
     private UserRepository userRepositoryMock;
     @Mock
-    private Validator validatorMock;
+    private UserService userServiceMock;
 
     @BeforeEach
     public void setUp() {
@@ -134,9 +134,10 @@ class UserControllerTest {
     }
 
     @Test
-    public void testCreateUser() {
+    public void testCreateUser() throws Exception {
         when(userRepositoryMock.save(any())).thenReturn(USER);
-        when(validatorMock.validateEmail(any())).thenReturn(true);
+        when(userServiceMock.createNewUser(any())).thenReturn(USER);
+
 
         ResponseEntity<User> result = underTest.createUser(USER);
         assertEquals(HttpStatus.CREATED, result.getStatusCode());
@@ -144,26 +145,14 @@ class UserControllerTest {
         assertSame(USER, result.getBody());
 
         verify(userRepositoryMock).save(any(User.class));
-        verify(validatorMock).validateEmail(same(USER.getMail()));
+        verify(userServiceMock).createNewUser(same(USER));
     }
 
     @Test
-    public void testCreateUserNoValidMail() {
-        when(validatorMock.validateEmail(any())).thenReturn(false);
-
-        ResponseEntity<User> result = underTest.createUser(USER);
-        assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, result.getStatusCode());
-        assertNull(result.getBody());
-
-        verify(validatorMock).validateEmail(same(USER.getMail()));
-        verifyNoInteractions(userRepositoryMock);
-    }
-
-    @Test
-    public void testUpdateUser() {
+    public void testUpdateUser() throws Exception {
         when(userRepositoryMock.findById(any())).thenReturn(Optional.of(USER));
         when(userRepositoryMock.save(any())).thenReturn(USER);
-        when(validatorMock.validateEmail(any())).thenReturn(true);
+        when(userServiceMock.updateUserInstance(any(), any())).thenReturn(USER);
 
         ResponseEntity<User> result = underTest.updateUser(USER.getId(), USER);
 
@@ -172,22 +161,7 @@ class UserControllerTest {
 
         verify(userRepositoryMock).findById(same(USER.getId()));
         verify(userRepositoryMock).save(same(USER));
-        verify(validatorMock).validateEmail(same(USER.getMail()));
-    }
-
-    @Test
-    public void testUpdateUserNoValidEmail() {
-        when(userRepositoryMock.findById(any())).thenReturn(Optional.of(USER));
-        when(validatorMock.validateEmail(any())).thenReturn(false);
-
-        ResponseEntity<User> result = underTest.updateUser(USER.getId(), USER);
-
-        assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, result.getStatusCode());
-        assertNull(result.getBody());
-
-        verify(userRepositoryMock).findById(same(USER.getId()));
-        verifyNoMoreInteractions(userRepositoryMock);
-        verify(validatorMock).validateEmail(same(USER.getMail()));
+        verify(userServiceMock).updateUserInstance(same(USER), same(USER));
     }
 
     @Test
@@ -201,7 +175,7 @@ class UserControllerTest {
 
         verify(userRepositoryMock).findById(same(USER.getId()));
         verifyNoMoreInteractions(userRepositoryMock);
-        verifyNoInteractions(validatorMock);
+        verifyNoInteractions(userServiceMock);
     }
 
     @Test
@@ -215,7 +189,7 @@ class UserControllerTest {
 
         verify(userRepositoryMock).findById(same(USER.getId()));
         verifyNoMoreInteractions(userRepositoryMock);
-        verifyNoInteractions(validatorMock);
+        verifyNoInteractions(userServiceMock);
     }
 
     @Test
