@@ -8,8 +8,12 @@ This is a basic spring boot application.
 
 ### Features 
 - Spring Boot
+- Different configurations for Dev and Prod as Spring Profiles
+  - dev -> port 8000
+  - prod -> port 9000  
 - Embedded MongoDB
 - Embedded Jetty Server
 - REST API with CRUD Operations
 - REST API which gives all users by a specific name
 - Docker
+- Publish Docker Image to Dockerhub via Github Action and Github Release
