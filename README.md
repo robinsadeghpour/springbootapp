@@ -2,7 +2,7 @@
 This is a basic spring boot application.
 
 ### Links
-- [Getting Started]()
+- [Getting Started](https://github.com/robinsadeghpour/springbootapp/wiki/Getting-Started)
 - [REST API Documentation]()
 - [Docker Repository]()
 
