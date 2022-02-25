@@ -1,8 +1,8 @@
 package com.demo.springbootapp.controller;
 
-
 import com.demo.springbootapp.model.User;
 import com.demo.springbootapp.repository.UserRepository;
+import com.demo.springbootapp.support.Validator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -17,6 +17,7 @@ import java.util.Optional;
 public class UserController {
 
     private UserRepository userRepository;
+    private Validator validator;
 
     @GetMapping("/users")
     public ResponseEntity<List<User>> getAllUser(@RequestParam(required = false) String name) {
@@ -52,7 +53,7 @@ public class UserController {
     @PostMapping("/users")
     public ResponseEntity<User> createUser(@RequestBody User user) {
         try {
-            User newUser = new User(user.getName(), user.getVorname(), user.getMail());
+            User newUser = createNewUser(user);
             User _user = userRepository.save(newUser);
             return new ResponseEntity<>(_user, HttpStatus.CREATED);
         } catch (Exception e) {
@@ -72,7 +73,6 @@ public class UserController {
         } catch (Exception e) {
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
-
     }
 
     @DeleteMapping("/users/{id}")
@@ -95,7 +95,21 @@ public class UserController {
         }
     }
 
-    private User updateUserInstance(User updateUser, User user) {
+    private User createNewUser(User user) throws Exception {
+        if (!validator.validateEmail(user.getMail())) {
+            throw new Exception("Not a valid E-Mail");
+        }
+        User newUser = new User();
+        newUser.setName(user.getName());
+        newUser.setVorname(user.getVorname());
+        newUser.setMail(user.getMail());
+        return newUser;
+    }
+
+    private User updateUserInstance(User updateUser, User user) throws Exception {
+        if (!validator.validateEmail(user.getMail())) {
+            throw new Exception("Not a valid E-Mail");
+        }
         user.setName(updateUser.getName());
         user.setVorname(updateUser.getVorname());
         user.setMail(updateUser.getMail());
@@ -105,5 +119,10 @@ public class UserController {
     @Autowired
     public void setUserRepository(UserRepository userRepository) {
         this.userRepository = userRepository;
+    }
+
+    @Autowired
+    public void setValidator(Validator validator) {
+        this.validator = validator;
     }
 }

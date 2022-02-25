@@ -2,6 +2,7 @@ package com.demo.springbootapp.controller;
 
 import com.demo.springbootapp.model.User;
 import com.demo.springbootapp.repository.UserRepository;
+import com.demo.springbootapp.support.Validator;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -21,10 +22,13 @@ import static org.mockito.MockitoAnnotations.openMocks;
 
 class UserControllerTest {
     public static final User USER = new User("robin", "sadeghpour", "r.sadegh.f@gmail.com");
+
     @InjectMocks
     private UserController underTest;
     @Mock
     private UserRepository userRepositoryMock;
+    @Mock
+    private Validator validatorMock;
 
     @BeforeEach
     public void setUp() {
@@ -132,6 +136,7 @@ class UserControllerTest {
     @Test
     public void testCreateUser() {
         when(userRepositoryMock.save(any())).thenReturn(USER);
+        when(validatorMock.validateEmail(any())).thenReturn(true);
 
         ResponseEntity<User> result = underTest.createUser(USER);
         assertEquals(HttpStatus.CREATED, result.getStatusCode());
@@ -139,12 +144,26 @@ class UserControllerTest {
         assertSame(USER, result.getBody());
 
         verify(userRepositoryMock).save(any(User.class));
+        verify(validatorMock).validateEmail(same(USER.getMail()));
+    }
+
+    @Test
+    public void testCreateUserNoValidMail() {
+        when(validatorMock.validateEmail(any())).thenReturn(false);
+
+        ResponseEntity<User> result = underTest.createUser(USER);
+        assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, result.getStatusCode());
+        assertNull(result.getBody());
+
+        verify(validatorMock).validateEmail(same(USER.getMail()));
+        verifyNoInteractions(userRepositoryMock);
     }
 
     @Test
     public void testUpdateUser() {
         when(userRepositoryMock.findById(any())).thenReturn(Optional.of(USER));
         when(userRepositoryMock.save(any())).thenReturn(USER);
+        when(validatorMock.validateEmail(any())).thenReturn(true);
 
         ResponseEntity<User> result = underTest.updateUser(USER.getId(), USER);
 
@@ -153,6 +172,22 @@ class UserControllerTest {
 
         verify(userRepositoryMock).findById(same(USER.getId()));
         verify(userRepositoryMock).save(same(USER));
+        verify(validatorMock).validateEmail(same(USER.getMail()));
+    }
+
+    @Test
+    public void testUpdateUserNoValidEmail() {
+        when(userRepositoryMock.findById(any())).thenReturn(Optional.of(USER));
+        when(validatorMock.validateEmail(any())).thenReturn(false);
+
+        ResponseEntity<User> result = underTest.updateUser(USER.getId(), USER);
+
+        assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, result.getStatusCode());
+        assertNull(result.getBody());
+
+        verify(userRepositoryMock).findById(same(USER.getId()));
+        verifyNoMoreInteractions(userRepositoryMock);
+        verify(validatorMock).validateEmail(same(USER.getMail()));
     }
 
     @Test
@@ -166,6 +201,7 @@ class UserControllerTest {
 
         verify(userRepositoryMock).findById(same(USER.getId()));
         verifyNoMoreInteractions(userRepositoryMock);
+        verifyNoInteractions(validatorMock);
     }
 
     @Test
@@ -179,6 +215,7 @@ class UserControllerTest {
 
         verify(userRepositoryMock).findById(same(USER.getId()));
         verifyNoMoreInteractions(userRepositoryMock);
+        verifyNoInteractions(validatorMock);
     }
 
     @Test
