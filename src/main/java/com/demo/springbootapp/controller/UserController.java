@@ -13,13 +13,13 @@ import java.util.List;
 import java.util.Optional;
 
 @RestController
-@RequestMapping("/api")
+@RequestMapping("/users")
 public class UserController {
 
     private UserRepository userRepository;
     private Validator validator;
 
-    @GetMapping("/users")
+    @GetMapping("/")
     public ResponseEntity<List<User>> getAllUser(@RequestParam(required = false) String name) {
         try {
             List<User> users = new ArrayList<>();
@@ -37,7 +37,7 @@ public class UserController {
         }
     }
 
-    @GetMapping("/users/{id}")
+    @GetMapping("/{id}")
     public ResponseEntity<User> getUserById(@PathVariable("id") String id) {
         try {
             Optional<User> userData = userRepository.findById(id);
@@ -50,7 +50,7 @@ public class UserController {
         }
     }
 
-    @PostMapping("/users")
+    @PostMapping("/")
     public ResponseEntity<User> createUser(@RequestBody User user) {
         try {
             User newUser = createNewUser(user);
@@ -61,7 +61,7 @@ public class UserController {
         }
     }
 
-    @PutMapping("/users/{id}")
+    @PutMapping("/{id}")
     public ResponseEntity<User> updateUser(@PathVariable("id") String id, @RequestBody User user) {
         try {
             Optional<User> userData = userRepository.findById(id);
@@ -75,7 +75,7 @@ public class UserController {
         }
     }
 
-    @DeleteMapping("/users/{id}")
+    @DeleteMapping("/{id}")
     public ResponseEntity<HttpStatus> deleteUser(@PathVariable("id") String id) {
         try {
             userRepository.deleteById(id);
@@ -85,7 +85,7 @@ public class UserController {
         }
     }
 
-    @DeleteMapping("/users")
+    @DeleteMapping("/")
     public ResponseEntity<HttpStatus> deleteAllUsers() {
         try {
             userRepository.deleteAll();
