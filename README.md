@@ -13,3 +13,4 @@ This is a basic spring boot application.
 - REST API with CRUD Operations
 - REST API which gives all users by a specific name
 - Docker
+- Publish Docker Image to Dockerhub via Github Action and Github Release
