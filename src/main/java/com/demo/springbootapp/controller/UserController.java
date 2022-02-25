@@ -20,16 +20,20 @@ public class UserController {
 
     @GetMapping("/users")
     public ResponseEntity<List<User>> getAllUser(@RequestParam(required = false) String name) {
-        List<User> users = new ArrayList<>();
-        if (name == null) {
-            users.addAll(userRepository.findAll());
-        } else {
-            users.addAll(userRepository.findByName(name));
+        try {
+            List<User> users = new ArrayList<>();
+            if (name == null) {
+                users.addAll(userRepository.findAll());
+            } else {
+                users.addAll(userRepository.findByName(name));
+            }
+            if (users.isEmpty()) {
+                return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+            }
+            return new ResponseEntity<>(users, HttpStatus.OK);
+        } catch (Exception e) {
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
-        if (users.isEmpty()) {
-            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
-        }
-        return new ResponseEntity<>(users, HttpStatus.OK);
     }
 
     @GetMapping("/users/{id}")
