@@ -39,7 +39,7 @@ class UserControllerTest {
     public void testGetAllUsers() {
         when(userRepositoryMock.findAll()).thenReturn(of(USER));
 
-        ResponseEntity<List<User>> result = underTest.getAllUser(null);
+        ResponseEntity<List<User>> result = underTest.getAllUsers(null);
 
         assertEquals(result.getStatusCode(), HttpStatus.OK);
         assertNotNull(result.getBody());
@@ -62,7 +62,7 @@ class UserControllerTest {
     public void testGetAllUsersByName(List<User> users, String name, List<User> expectedResult) {
         when(userRepositoryMock.findByName(any())).thenReturn(users);
 
-        ResponseEntity<List<User>> result = underTest.getAllUser(name);
+        ResponseEntity<List<User>> result = underTest.getAllUsers(name);
 
         assertEquals(HttpStatus.OK, result.getStatusCode());
         assertNotNull(result.getBody());
@@ -87,7 +87,7 @@ class UserControllerTest {
             when(userRepositoryMock.findByName(any())).thenReturn(of());
         }
 
-        ResponseEntity<List<User>> result = underTest.getAllUser(name);
+        ResponseEntity<List<User>> result = underTest.getAllUsers(name);
 
         assertEquals(HttpStatus.NO_CONTENT, result.getStatusCode());
         assertNull(result.getBody());

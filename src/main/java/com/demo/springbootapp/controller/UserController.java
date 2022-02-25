@@ -13,14 +13,14 @@ import java.util.List;
 import java.util.Optional;
 
 @RestController
-@RequestMapping("/users")
+@RequestMapping("/api")
 public class UserController {
 
     private UserRepository userRepository;
     private Validator validator;
 
-    @GetMapping("/")
-    public ResponseEntity<List<User>> getAllUser(@RequestParam(required = false) String name) {
+    @GetMapping("/users")
+    public ResponseEntity<List<User>> getAllUsers(@RequestParam(required = false) String name) {
         try {
             List<User> users = new ArrayList<>();
             if (name == null) {
