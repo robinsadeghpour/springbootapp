@@ -8,7 +8,7 @@ This is a basic spring boot application.
 
 ### Features 
 - Spring Boot
-- Different configurations with Spring Profile
+- Different configurations for Dev and Prod as Spring Profiles
   - dev -> port 8000
   - prod -> port 9000  
 - Embedded MongoDB
