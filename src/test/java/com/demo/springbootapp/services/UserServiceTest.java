@@ -1,5 +1,6 @@
 package com.demo.springbootapp.services;
 
+import com.demo.springbootapp.error.InvalidMailException;
 import com.demo.springbootapp.model.User;
 import com.demo.springbootapp.support.Validator;
 import org.junit.jupiter.api.AfterEach;
@@ -18,6 +19,7 @@ import static org.mockito.MockitoAnnotations.openMocks;
 class UserServiceTest {
 
     public static final User USER = new User("robin", "sadeghpour", "r.sadegh.f@gmail.com");
+    public static final User UPDATED_USER = new User("robin", "sadeghpour-faraj", "r.sadegh.f@gmail.com");
 
     @InjectMocks
     private UserService underTest;
@@ -36,7 +38,7 @@ class UserServiceTest {
     }
 
     @Test
-    void createNewUser() throws Exception {
+    void createNewUser() throws InvalidMailException {
         User result = underTest.createNewUser(USER);
         assertNotNull(result);
         assertNotNull(result.getId());
@@ -48,18 +50,22 @@ class UserServiceTest {
     @Test
     void createNewUserNonValidEmail() {
         when(validatorMock.validateEmail(any())).thenReturn(false);
-        assertThrows(Exception.class, () -> underTest.createNewUser(USER));
+        assertThrows(InvalidMailException.class, () -> underTest.createNewUser(USER));
     }
 
     @Test
-    void updateUserInstance() throws Exception {
-        User result = underTest.updateUserInstance(USER, USER);
-        assertSame(USER, result);
+    void updateUserInstance() throws InvalidMailException {
+        User result = underTest.updateUserInstance(UPDATED_USER, USER);
+        assertNotNull(result);
+        assertEquals(USER.getId(), result.getId());
+        assertEquals(UPDATED_USER.getName(), result.getName());
+        assertEquals(UPDATED_USER.getVorname(), result.getVorname());
+        assertEquals(UPDATED_USER.getMail(), result.getMail());
     }
 
     @Test
     void updateUserInstanceNonValidEmail() {
         when(validatorMock.validateEmail(any())).thenReturn(false);
-        assertThrows(Exception.class, () -> underTest.createNewUser(USER));
+        assertThrows(InvalidMailException.class, () -> underTest.updateUserInstance(UPDATED_USER, USER));
     }
 }

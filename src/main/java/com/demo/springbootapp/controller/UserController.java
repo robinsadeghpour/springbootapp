@@ -1,5 +1,7 @@
 package com.demo.springbootapp.controller;
 
+import com.demo.springbootapp.error.InvalidMailException;
+import com.demo.springbootapp.error.NoUsersException;
 import com.demo.springbootapp.model.User;
 import com.demo.springbootapp.repository.UserRepository;
 import com.demo.springbootapp.services.UserService;
@@ -8,6 +10,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -20,7 +23,7 @@ public class UserController {
     private UserService userService;
 
     @GetMapping("/users")
-    public ResponseEntity<List<User>> getAllUsers(@RequestParam(required = false) String name) {
+    public ResponseEntity<List<User>> getAllUsers(@RequestParam(required = false) String name) throws NoUsersException {
         List<User> users = new ArrayList<>();
         if (name == null) {
             users.addAll(userRepository.findAll());
@@ -28,7 +31,7 @@ public class UserController {
             users.addAll(userRepository.findByName(name));
         }
         if (users.isEmpty()) {
-            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+            throw new NoUsersException();
         }
         return new ResponseEntity<>(users, HttpStatus.OK);
     }
@@ -43,14 +46,14 @@ public class UserController {
     }
 
     @PostMapping("/users")
-    public ResponseEntity<User> createUser(@RequestBody User user) throws Exception {
+    public ResponseEntity<User> createUser(@Valid @RequestBody User user) throws InvalidMailException {
         User newUser = userService.createNewUser(user);
         User _user = userRepository.save(newUser);
         return new ResponseEntity<>(_user, HttpStatus.CREATED);
     }
 
     @PutMapping("/users/{id}")
-    public ResponseEntity<User> updateUser(@PathVariable("id") String id, @RequestBody User user) throws Exception {
+    public ResponseEntity<User> updateUser(@PathVariable("id") String id, @Valid @RequestBody User user) throws InvalidMailException {
         Optional<User> userData = userRepository.findById(id);
         if (userData.isEmpty()) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);

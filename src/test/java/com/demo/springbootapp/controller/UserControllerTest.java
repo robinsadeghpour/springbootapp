@@ -1,5 +1,6 @@
 package com.demo.springbootapp.controller;
 
+import com.demo.springbootapp.error.NoUsersException;
 import com.demo.springbootapp.model.User;
 import com.demo.springbootapp.repository.UserRepository;
 import com.demo.springbootapp.services.UserService;
@@ -87,10 +88,7 @@ class UserControllerTest {
             when(userRepositoryMock.findByName(any())).thenReturn(of());
         }
 
-        ResponseEntity<List<User>> result = underTest.getAllUsers(name);
-
-        assertEquals(HttpStatus.NO_CONTENT, result.getStatusCode());
-        assertNull(result.getBody());
+        assertThrows(NoUsersException.class, () -> underTest.getAllUsers(name));
 
         if (name == null) {
             verify(userRepositoryMock).findAll();
@@ -123,10 +121,9 @@ class UserControllerTest {
     }
 
     @Test
-    public void testCreateUser() throws Exception {
+    public void testCreateUser() {
         when(userRepositoryMock.save(any())).thenReturn(USER);
         when(userServiceMock.createNewUser(any())).thenReturn(USER);
-
 
         ResponseEntity<User> result = underTest.createUser(USER);
         assertEquals(HttpStatus.CREATED, result.getStatusCode());
@@ -138,7 +135,7 @@ class UserControllerTest {
     }
 
     @Test
-    public void testUpdateUser() throws Exception {
+    public void testUpdateUser() {
         when(userRepositoryMock.findById(any())).thenReturn(Optional.of(USER));
         when(userRepositoryMock.save(any())).thenReturn(USER);
         when(userServiceMock.updateUserInstance(any(), any())).thenReturn(USER);
@@ -154,7 +151,7 @@ class UserControllerTest {
     }
 
     @Test
-    public void testUpdateUserEmpty() throws Exception {
+    public void testUpdateUserEmpty() {
         when(userRepositoryMock.findById(any())).thenReturn(Optional.empty());
 
         ResponseEntity<User> result = underTest.updateUser(USER.getId(), USER);

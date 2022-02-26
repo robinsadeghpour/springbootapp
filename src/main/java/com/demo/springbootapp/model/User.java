@@ -3,14 +3,18 @@ package com.demo.springbootapp.model;
 import lombok.Data;
 import org.springframework.data.annotation.Id;
 
+import javax.validation.constraints.NotBlank;
 import java.util.UUID;
 
 @Data
 public class User {
     @Id
     private String id;
+    @NotBlank(message = "Name is mandatory")
     private String name;
+    @NotBlank(message = "Vorname is mandatory")
     private String vorname;
+    @NotBlank(message = "Email is mandatory")
     private String mail;
 
     public User() {
