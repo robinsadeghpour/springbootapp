@@ -2,6 +2,7 @@ package com.demo.springbootapp.controller;
 
 import com.demo.springbootapp.error.InvalidMailException;
 import com.demo.springbootapp.error.NoUsersException;
+import com.demo.springbootapp.error.UserNotFoundException;
 import com.demo.springbootapp.model.User;
 import com.demo.springbootapp.repository.UserRepository;
 import com.demo.springbootapp.services.UserService;
@@ -40,7 +41,7 @@ public class UserController {
     public ResponseEntity<User> getUserById(@PathVariable("id") String id) {
         Optional<User> userData = userRepository.findById(id);
         if (userData.isEmpty()) {
-            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+            throw new UserNotFoundException();
         }
         return new ResponseEntity<>(userData.get(), HttpStatus.OK);
     }
@@ -56,7 +57,7 @@ public class UserController {
     public ResponseEntity<User> updateUser(@PathVariable("id") String id, @Valid @RequestBody User user) throws InvalidMailException {
         Optional<User> userData = userRepository.findById(id);
         if (userData.isEmpty()) {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+            throw new UserNotFoundException();
         }
         User updatedUser = userService.updateUserInstance(user, userData.get());
         return new ResponseEntity<>(userRepository.save(updatedUser), HttpStatus.OK);

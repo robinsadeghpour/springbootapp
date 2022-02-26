@@ -1,6 +1,7 @@
 package com.demo.springbootapp.controller;
 
 import com.demo.springbootapp.error.NoUsersException;
+import com.demo.springbootapp.error.UserNotFoundException;
 import com.demo.springbootapp.model.User;
 import com.demo.springbootapp.repository.UserRepository;
 import com.demo.springbootapp.services.UserService;
@@ -113,9 +114,7 @@ class UserControllerTest {
     public void testGetUserByIdEmpty() {
         when(userRepositoryMock.findById(any())).thenReturn(Optional.empty());
 
-        ResponseEntity<User> result = underTest.getUserById(USER.getId());
-        assertEquals(HttpStatus.NO_CONTENT, result.getStatusCode());
-        assertNull(result.getBody());
+        assertThrows(UserNotFoundException.class, () -> underTest.getUserById(USER.getId()));
 
         verify(userRepositoryMock).findById(same(USER.getId()));
     }
@@ -154,10 +153,7 @@ class UserControllerTest {
     public void testUpdateUserEmpty() {
         when(userRepositoryMock.findById(any())).thenReturn(Optional.empty());
 
-        ResponseEntity<User> result = underTest.updateUser(USER.getId(), USER);
-
-        assertEquals(HttpStatus.NOT_FOUND, result.getStatusCode());
-        assertNull(result.getBody());
+        assertThrows(UserNotFoundException.class, () -> underTest.updateUser(USER.getId(), USER));
 
         verify(userRepositoryMock).findById(same(USER.getId()));
         verifyNoMoreInteractions(userRepositoryMock);
